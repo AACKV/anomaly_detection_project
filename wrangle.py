@@ -9,6 +9,9 @@ from env import get_db_url
 import os 
 
 def get_logs_data():
+    ''' This function reads in the logs data from the curriculum_logs Codeup database, writes data to
+    a csv file if a local file does not exist, and returns a df.
+    '''
     filename = 'logs_data.csv'
     
     if os.path.isfile(filename):
@@ -31,6 +34,11 @@ def get_logs_data():
 
 
 def get_cohorts_data():
+
+     ''' This function reads in the logs data from the curriculum_logs Codeup database, writes data to
+    a csv file if a local file does not exist, and returns a df.
+    '''
+    
     filename = 'cohorts_data.csv'
     
     if os.path.isfile(filename):
