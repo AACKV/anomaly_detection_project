@@ -35,7 +35,7 @@ def scrape_ip_locations(df, index_num=0):
         except:
             print(data)
             
-    result_df = pd.concat([result_df,locations])
+    result_df = pd.concat([result_df,pd.DataFrame(locations)])
     result_df = result_df.drop_duplicates()
     
     result_df.to_csv(filename)
