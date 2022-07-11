@@ -32,7 +32,6 @@ def get_logs_data():
 
 
 
-
 def get_cohorts_data():
 
     ''' This function reads in the logs data from the curriculum_logs Codeup database, writes data to
@@ -56,3 +55,29 @@ def get_cohorts_data():
         df.to_csv(filename)
         
         return df
+
+
+
+def wrangle_logs():
+    '''Wrangles the curriculum access logs, converts date + time to one datetime column, drops unnecessary columns'''
+    
+    # load in cohort/logs
+    cohorts = get_cohorts_data()
+    logs = get_logs_data()
+
+    # dropping unnamed col
+    for col in cohorts.columns:
+        if 'Unnamed' in col or 'deleted' in col:
+            cohorts = cohorts.drop(columns=[col])
+
+    for col in logs.columns:
+        if 'Unnamed' in col:
+            logs = logs.drop(columns=[col])
+
+    # Join and format final table
+    logs = logs.fillna(0)
+    df = pd.merge(left_on=logs.cohort_id, right_on=cohorts.id, left=logs, right=cohorts,how='outer')
+    df.date = pd.to_datetime(df.date + " " + df.time)
+    df = df.drop(columns=['key_0', 'id', 'time'])
+
+    return df
