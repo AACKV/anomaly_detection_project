@@ -45,6 +45,7 @@ def scrape_ip_locations(df, index_num=0):
     return result_df
 
 def webdev_visuals(wd_after_grad):
+
     wd_results = {'topic': ['javascript', 'java', 'css', 'spring', 'sql', 'jquery', 'appendix', 'capstone', 'random/ds_topics'], 
               'num_times_accessed': [wd_after_grad[wd_after_grad.path.str.contains('javascript[-/]|javascript$')].shape[0],
                                 wd_after_grad[wd_after_grad.path.str.contains('java[-/]|_java|java$')].shape[0],
@@ -57,8 +58,10 @@ def webdev_visuals(wd_after_grad):
                                 wd_after_grad.shape[0]- wd_after_grad[wd_after_grad.path.str.contains('java|sql|jquery|spring|css|appendix|capstone|toc')].shape[0]]}
 
     wd_results_df = pd.DataFrame(wd_results).sort_values('num_times_accessed', ascending=False)
-
+    
+    plt.figure(figsize=(16, 5))
     sns.barplot(data= wd_results_df, x = 'topic', y = 'num_times_accessed')
+    plt.title('Web Development Curriculum Access Post Graduation')
     plt.show()
 
     print("The two largest subgroups are as follows:\n"
@@ -84,11 +87,13 @@ def ds_visuals(ds_after_grad):
                                 ds_after_grad[ds_after_grad.path.str.contains('storytelling')].shape[0],
                                 ds_after_grad.shape[0]- ds_after_grad[ds_after_grad.path.str.contains('capstone|sql|python|stats|fundamentals|regression|clustering|nlp|appendix|timeseries|anomaly|classification|spark|python|storytelling')].shape[0]]}
 
+    plt.figure(figsize=(16, 5)) 
     ds_results_df = pd.DataFrame(ds_results).sort_values('num_times_accessed', ascending=False)
     sns.barplot(data= ds_results_df, x = 'topic', y = 'num_times_accessed')
+    plt.title('Data Science Curriculum Access Post Graduation')
     plt.show()
 
     print("The two largest subgroups are as follows:\n"
-     f"Java accounts for {round(ds_after_grad[ds_after_grad.path.str.contains('sql', case = False)].shape[0] / ds_after_grad.shape[0], 4)*100}% \n"
-     f"Javascript accounts for {round(ds_after_grad[ds_after_grad.path.str.contains('fundamentals', case = False)].shape[0]/ ds_after_grad.shape[0], 4)*100}%\n"
+     f"SQL accounts for {round(ds_after_grad[ds_after_grad.path.str.contains('sql', case = False)].shape[0] / ds_after_grad.shape[0], 4)*100}% \n"
+     f"Fundamentals accounts for {round(ds_after_grad[ds_after_grad.path.str.contains('fundamentals', case = False)].shape[0]/ ds_after_grad.shape[0], 4)*100}%\n"
      f"Classification accounts for {round(round(ds_after_grad[ds_after_grad.path.str.contains('classification', case = False)].shape[0]/ ds_after_grad.shape[0], 4)*100, 4)}%")
