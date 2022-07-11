@@ -140,3 +140,86 @@ def webdev_subtopics():
     plt.legend(handles=[red_patch], fontsize=15)
     plt.xticks(rotation=65)
     plt.show()
+
+
+
+def accessed_once_series(the_df):
+    df = pd.Series((the_df.path.value_counts()==1).index, name='paths').dropna()
+    return df
+
+def least_accessed(the_df):
+    df = accessed_once_series(the_df)
+
+    topics = ['sql', 'python', 'stats', 'fundamentals', 'regression', 'clustering', 'nlp',
+              'appendix', 'timeseries', 'anomaly', 'classification', 'spark', 'storytelling', 'javascript', 'java',
+             'css', 'spring', 'jquery', 'capstone', 'php', 'cli', 'git', 'laravel', 'angular', 'web-design', 
+             'prework', 'apache', 'django', 'other_topics', 'pre-work']
+
+    all_topics_reg_ex = '|'.join(topics)
+    results = {'topic': topics, 
+                  'num_times_accessed': [df[df.str.contains('sql')].shape[0],
+                                    df[df.str.contains('python')].shape[0],
+                                    df[df.str.contains('stats')].shape[0],
+                                    df[df.str.contains('fundamentals')].shape[0],
+                                    df[df.str.contains('regression')].shape[0],
+                                    df[df.str.contains('clustering')].shape[0],
+                                    df[df.str.contains('nlp')].shape[0],
+                                    df[df.str.contains('appendix')].shape[0],
+                                    df[df.str.contains('timeseries')].shape[0],
+                                    df[df.str.contains('anomaly')].shape[0],
+                                    df[df.str.contains('classification')].shape[0], 
+                                    df[df.str.contains('spark')].shape[0],
+                                    df[df.str.contains('storytelling')].shape[0],
+                                    df[df.str.contains('javascript[-/]|javascript$')].shape[0],
+                                    df[df.str.contains('java[-/]|_java|java$')].shape[0],
+                                    df[df.str.contains('css')].shape[0],
+                                    df[df.str.contains('spring')].shape[0],
+                                    df[df.str.contains('jquery')].shape[0],
+                                    df[df.str.contains('capstone')].shape[0],
+                                    df[df.str.contains('php')].shape[0],
+                                    df[df.str.contains('cli')].shape[0],
+                                    df[df.str.contains('git')].shape[0],
+                                    df[df.str.contains('laravel')].shape[0],
+                                    df[df.str.contains('angular')].shape[0],
+                                    df[df.str.contains('web-design')].shape[0],
+                                    df[df.str.contains('prework')].shape[0],
+                                    df[df.str.contains('apache')].shape[0],
+                                    df[df.str.contains('django')].shape[0],
+                                    df.shape[0]- df[df.str.contains(all_topics_reg_ex)].shape[0],
+                                    df[df.str.contains('pre-work')].shape[0]]}
+
+    results = pd.DataFrame(results).sort_values('num_times_accessed', ascending=False)
+    return results
+
+def other_topics(the_df):
+    df = accessed_once_series(the_df)
+    
+    topics = ['sql', 'python', 'stats', 'fundamentals', 'regression', 'clustering', 'nlp',
+              'appendix', 'timeseries', 'anomaly', 'classification', 'spark', 'storytelling', 'javascript', 'java',
+             'css', 'spring', 'jquery', 'capstone', 'php', 'cli', 'git', 'laravel', 'angular', 'web-design', 'prework',
+             'apache', 'django', 'other_topics', 'pre-work']
+
+    all_topics_reg_ex = '|'.join(topics)
+    
+    df= df[~df.str.contains(all_topics_reg_ex, case=False)]
+    
+    return df
+
+def without_file_pages(the_df):
+    series = accessed_once_series(the_df)
+    files = ['.html', '.json', '.aspx', '.jpg', '.jpeg', '.png', '.csv', '.mov', '.zip', 'slides', '.md', '.txt',
+             '.ico']
+    files = [file+ '$' if file != 'slides' else file for file in files]
+    files = '|'.join(files)
+    
+    series = series[~series.str.contains(files)]
+    
+    return series
+
+
+def create_least_viewed_viz(df):
+    least= least_accessed(df)
+
+    plt.title('Subject Frequency in Least Viewed Pages')
+    sns.barplot(data= least[:6], x = 'topic', y = 'num_times_accessed')
+    
