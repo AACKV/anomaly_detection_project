@@ -142,15 +142,14 @@ def webdev_subtopics():
     plt.show()
 
 
-
-<<<<<<< HEAD
+############
 
 def anomalies_df(df):
 
     def prep(df, user):
-    df = df[df.user_id == user]
-    pages = df['path'].resample('d').count()
-    return pages
+        df = df[df.user_id == user]
+        pages = df['path'].resample('d').count()
+        return pages
 
     def compute_pct_b(pages, span, weight, user):
         midband = pages.ewm(span=span).mean()
@@ -201,7 +200,7 @@ def anomalies_df(df):
     df = df.sort_values(by = ['pages'], ascending = False)
 
     columns = ['midband', 'ub', 'lb', 'pct_b']
-    df = sorted_df.drop(columns, axis = 1)
+    df = df.drop(columns, axis = 1)
 
     df = df.head(6)
 
@@ -211,19 +210,14 @@ def anomalies_df(df):
         city_list = ['Dallas', 'San_Antonio' , 'San_Antonio' , 'San_Antonio' , 'San_Antonio', 'San_Antonio']
         country_list = ['US','US','US','US','US', 'US']
         region_list = ['Texas','Texas','Texas','Texas', 'Texas', 'Texas']
-        df.assign(cohort = cohort_list,
-                                       ip = suspicious_ips,
-                                       city = city_list, 
-                                      country = country_list,
-                                      region = region_list)
+        df = df.assign(cohort = cohort_list, ip = suspicious_ips, city = city_list, country = country_list, region = region_list)
         return df
 
     df = anomaly_df_builder(df)
     return df
+##############
 
 
-
-=======
 def accessed_once_series(the_df):
     df = pd.Series((the_df.path.value_counts()==1).index, name='paths').dropna()
     return df
@@ -304,4 +298,4 @@ def create_least_viewed_viz(df):
     plt.title('Subject Frequency in Least Viewed Pages')
     sns.barplot(data= least[:6], x = 'topic', y = 'num_times_accessed')
     
->>>>>>> 28f817e741c434081ccda44bc466f1eccec07e2b
+######
