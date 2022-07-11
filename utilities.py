@@ -218,6 +218,8 @@ def without_file_pages(the_df):
 
 
 def create_least_viewed_viz(df):
+    df.path = df.path.astype('string')
+    df= df.fillna(' ')
     least= least_accessed(df)
 
     plt.title('Subject Frequency in Least Viewed Pages')
