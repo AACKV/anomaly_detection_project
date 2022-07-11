@@ -125,3 +125,85 @@ def webdev_subtopics():
     plt.legend(handles=[red_patch], fontsize=15)
     plt.xticks(rotation=65)
     plt.show()
+
+
+
+
+def anomalies_df(df):
+
+    def prep(df, user):
+    df = df[df.user_id == user]
+    pages = df['path'].resample('d').count()
+    return pages
+
+    def compute_pct_b(pages, span, weight, user):
+        midband = pages.ewm(span=span).mean()
+        stdev = pages.ewm(span=span).std()
+        ub = midband + stdev*weight
+        lb = midband - stdev*weight
+        bb = pd.concat([ub, lb], axis=1)
+        my_df = pd.concat([pages, midband, bb], axis=1)
+        my_df.columns = ['pages', 'midband', 'ub', 'lb']
+        my_df['pct_b'] = (my_df['pages'] - my_df['lb'])/(my_df['ub'] - my_df['lb'])
+        my_df['user_id'] = user
+        return my_df
+
+    def plt_bands(my_df, user):
+        fig, ax = plt.subplots(figsize=(12,8))
+        ax.plot(my_df.index, my_df.pages, label='Number of Pages, User: '+str(user))
+        ax.plot(my_df.index, my_df.midband, label = 'EMA/midband')
+        ax.plot(my_df.index, my_df.ub, label = 'Upper Band')
+        ax.plot(my_df.index, my_df.lb, label = 'Lower Band')
+        ax.legend(loc='best')
+        ax.set_ylabel('Number of Pages')
+        plt.show()
+
+    def find_anomalies(df, user, span, weight):
+        pages = prep(df, user)
+        my_df = compute_pct_b(pages, span, weight, user)
+        # plt_bands(my_df, user)
+        return my_df[my_df.pct_b>1]
+
+    user = 1
+    span = 30
+    weight = 6
+    user_df = find_anomalies(df, user, span, weight)
+
+    anomalies = pd.DataFrame()
+    user_df = find_anomalies(df, user, span, weight)
+    anomalies = pd.concat([anomalies, user_df], axis=0)
+
+    span = 30
+    weight = 3.5
+
+    anomalies = pd.DataFrame()
+    for u in list(df.user_id.unique()):
+        user_df = find_anomalies(df, u, span, weight)
+        anomalies = pd.concat([anomalies, user_df], axis=0)
+
+    df = anomalies[anomalies.pages  >= 100]
+    df = df.sort_values(by = ['pages'], ascending = False)
+
+    columns = ['midband', 'ub', 'lb', 'pct_b']
+    df = sorted_df.drop(columns, axis = 1)
+
+    df = df.head(6)
+
+    def anomaly_df_builder(df):
+        suspicious_ips = ['204.44.112.76', '108.65.244.91', '172.124.70.146', '70.130.123.81', '99.88.62.179', '136.50.20.17']
+        cohort_list = ['Zion', 'Teddy' , 'Europa' , 'Hyperion', 'Europa', 'Wrangell' ]
+        city_list = ['Dallas', 'San_Antonio' , 'San_Antonio' , 'San_Antonio' , 'San_Antonio', 'San_Antonio']
+        country_list = ['US','US','US','US','US', 'US']
+        region_list = ['Texas','Texas','Texas','Texas', 'Texas', 'Texas']
+        df.assign(cohort = cohort_list,
+                                       ip = suspicious_ips,
+                                       city = city_list, 
+                                      country = country_list,
+                                      region = region_list)
+        return df
+
+    df = anomaly_df_builder(df)
+    return df
+
+
+
