@@ -93,7 +93,7 @@ def ds_visuals(ds_after_grad):
     plt.title('Data Science Curriculum Access Post Graduation')
     plt.show()
 
-    print("The two largest subgroups are as follows:\n"
+    print("The largest subgroups are as follows:\n"
      f"SQL accounts for {round(ds_after_grad[ds_after_grad.path.str.contains('sql', case = False)].shape[0] / ds_after_grad.shape[0], 4)*100}% \n"
      f"Fundamentals accounts for {round(ds_after_grad[ds_after_grad.path.str.contains('fundamentals', case = False)].shape[0]/ ds_after_grad.shape[0], 4)*100}%\n"
      f"Classification accounts for {round(round(ds_after_grad[ds_after_grad.path.str.contains('classification', case = False)].shape[0]/ ds_after_grad.shape[0], 4)*100, 4)}%")
