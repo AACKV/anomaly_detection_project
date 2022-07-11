@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
 def scrape_ip_locations(df, index_num=0):
     """ needs original log df (900000 rows), index_num = n where n is which ip address index you want to start at."""
@@ -97,3 +98,30 @@ def ds_visuals(ds_after_grad):
      f"SQL accounts for {round(ds_after_grad[ds_after_grad.path.str.contains('sql', case = False)].shape[0] / ds_after_grad.shape[0], 4)*100}% \n"
      f"Fundamentals accounts for {round(ds_after_grad[ds_after_grad.path.str.contains('fundamentals', case = False)].shape[0]/ ds_after_grad.shape[0], 4)*100}%\n"
      f"Classification accounts for {round(round(ds_after_grad[ds_after_grad.path.str.contains('classification', case = False)].shape[0]/ ds_after_grad.shape[0], 4)*100, 4)}%")
+
+def webdev_subtopics():
+    # Making a dataframe to contain the most accessed subtopics
+    sub_topics_list = ['java-i/introduction-to-java', 
+                    'java-i/syntax-types-and-variables', 
+                    'java-ii/object-oriented-programming', 
+                    'java-iii/servlets', 
+                    'javascript-i/functions', 
+                    'javascript-i/javascript-with-html', 
+                    'spring/fundamentals/controllers', 
+                    'spring/setup', 
+                    'spring/fundamentals/views',
+                    'spring/fundamentals/repositories',
+                    'html-css/elements',
+                    'html-css/introduction']
+    occurances_list = [894, 847, 822, 811, 785, 775, 1299, 1236, 1166, 1073, 937, 800]
+    wd_subtopics = {'subtopic': sub_topics_list, 'num_times_accessed': occurances_list}
+    wd_subtopics_df = pd.DataFrame(wd_subtopics).sort_values('num_times_accessed', ascending=False)
+
+    plt.figure(figsize=(16, 5)) 
+    clrs = ['#2BA823', '#2BA823', '#2BA823', '#2BA823', 'grey', 'grey', 'grey', 'grey', 'grey', 'grey', 'grey', 'grey' ]
+    sns.barplot(data= wd_subtopics_df, x = 'subtopic', y = 'num_times_accessed', palette = clrs)
+    plt.title('Web Dev Curriculum Access Post Graduation - Specific subtopic')
+    red_patch = mpatches.Patch(color='#2BA823', label='Lessons covering Spring')
+    plt.legend(handles=[red_patch], fontsize=15)
+    plt.xticks(rotation=65)
+    plt.show()
