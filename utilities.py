@@ -46,6 +46,11 @@ def scrape_ip_locations(df, index_num=0):
     return result_df
 
 def webdev_visuals(wd_after_grad):
+    '''
+    This function takes in a dataframe of Web Development students' curriculum access logs post graduation and plots out a visual of 
+    the data showing the most commonly accessed topics and prints out a statement giving percentage values of each of the two largest 
+    topics.
+    '''
 
     wd_results = {'topic': ['javascript', 'java', 'css', 'spring', 'sql', 'jquery', 'appendix', 'capstone', 'random/ds_topics'], 
               'num_times_accessed': [wd_after_grad[wd_after_grad.path.str.contains('javascript[-/]|javascript$')].shape[0],
@@ -70,6 +75,11 @@ def webdev_visuals(wd_after_grad):
      f"Javascript accounts for {round(wd_after_grad[wd_after_grad.path.str.contains('javascript[-/]|javascript$')].shape[0]/ wd_after_grad.shape[0], 4)*100}%")
 
 def ds_visuals(ds_after_grad):
+    '''
+    This function takes in a dataframe of Data Science students' curriculum access logs post graduation and plots out a visual of the 
+    data showing the most commonly accessed topics and prints out a statement giving percentage values of each of the three largest 
+    topics.
+    '''
     ds_results = {'topic': ['capstone','sql','python', 'stats', 'fundamentals', 'regression', 'clustering', 'nlp', 'appendix', 'timeseries', 'anomaly', 'classification', 'spark', 'python', 'storytelling','other_topics'], 
               'num_times_accessed': [ds_after_grad[ds_after_grad.path.str.contains('capstone')].shape[0],
                                 ds_after_grad[ds_after_grad.path.str.contains('sql')].shape[0],
@@ -100,6 +110,11 @@ def ds_visuals(ds_after_grad):
      f"Classification accounts for {round(round(ds_after_grad[ds_after_grad.path.str.contains('classification', case = False)].shape[0]/ ds_after_grad.shape[0], 4)*100, 4)}%")
 
 def webdev_subtopics():
+    '''
+    This function visually represents the most accessed single lessons/paths for Web Development graduates post graduation. It 
+    specifically highlights how the top four results are all lessons covering Spring.
+    '''
+
     # Making a dataframe to contain the most accessed subtopics
     sub_topics_list = ['java-i/introduction-to-java', 
                     'java-i/syntax-types-and-variables', 
