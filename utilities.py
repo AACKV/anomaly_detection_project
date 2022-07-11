@@ -215,6 +215,21 @@ def anomalies_df(df):
 
     df = anomaly_df_builder(df)
     return df
+
+
+
+
+
+
+def pages_chart(df):
+    '''
+    This function takes in a df, creates a variable named pages, and plots the log record count for each day
+    '''
+    pages = df['path'].resample('d').count()
+    return px.line(x = pages.index, y = pages)
+    
+
+
 ##############
 
 
