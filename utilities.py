@@ -7,7 +7,11 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
 def scrape_ip_locations(df, index_num=0):
-    """ needs original log df (900000 rows), index_num = n where n is which ip address index you want to start at."""
+    '''
+    Needs original access log df (900000 rows), index_num = n where n is which ip address index you want to start at
+    if you don't want to scrape all at once. 
+    '''
+    
     locations = []
     i=0
     
@@ -142,8 +146,6 @@ def webdev_subtopics():
     plt.show()
 
 
-############
-
 def anomalies_df(df):
 
     def prep(df, user):
@@ -200,7 +202,7 @@ def anomalies_df(df):
     df = df.sort_values(by = ['pages'], ascending = False)
 
     columns = ['midband', 'ub', 'lb', 'pct_b']
-    df = df.drop(columns, axis = 1)
+    df = sorted_df.drop(columns, axis = 1)
 
     df = df.head(6)
 
@@ -210,7 +212,11 @@ def anomalies_df(df):
         city_list = ['Dallas', 'San_Antonio' , 'San_Antonio' , 'San_Antonio' , 'San_Antonio', 'San_Antonio']
         country_list = ['US','US','US','US','US', 'US']
         region_list = ['Texas','Texas','Texas','Texas', 'Texas', 'Texas']
-        df = df.assign(cohort = cohort_list, ip = suspicious_ips, city = city_list, country = country_list, region = region_list)
+        df.assign(cohort = cohort_list,
+                                       ip = suspicious_ips,
+                                       city = city_list, 
+                                      country = country_list,
+                                      region = region_list)
         return df
 
     df = anomaly_df_builder(df)
@@ -218,26 +224,20 @@ def anomalies_df(df):
 
 
 
-
-
-
-def pages_chart(df):
+def accessed_once_series(df):
     '''
-    This function takes in a df, creates a variable named pages, and plots the log record count for each day
+    Input is the original dataframe, returns a series of paths that were only accessed once.
     '''
-    pages = df['path'].resample('d').count()
-    return px.line(x = pages.index, y = pages)
-    
 
-
-##############
-
-
-def accessed_once_series(the_df):
-    df = pd.Series((the_df.path.value_counts()==1).index, name='paths').dropna()
-    return df
+    series = pd.Series((df.path.value_counts()==1).index, name='paths').dropna()
+    return series
 
 def least_accessed(the_df):
+    '''
+    Returns a df that contains the times a certain topic has been accessed by its appearance in a path.
+    Topics defined by 'topics' list.
+    '''
+
     df = accessed_once_series(the_df)
 
     topics = ['sql', 'python', 'stats', 'fundamentals', 'regression', 'clustering', 'nlp',
@@ -281,21 +281,30 @@ def least_accessed(the_df):
     results = pd.DataFrame(results).sort_values('num_times_accessed', ascending=False)
     return results
 
-def other_topics(the_df):
-    df = accessed_once_series(the_df)
+def other_topics(df):
+    ''' 
+    Returns a series of the pages accessed once that don't fall into a specified category,
+    categories being defined by the list 'topics'.
+    '''
+
+    series = accessed_once_series(df)
     
     topics = ['sql', 'python', 'stats', 'fundamentals', 'regression', 'clustering', 'nlp',
               'appendix', 'timeseries', 'anomaly', 'classification', 'spark', 'storytelling', 'javascript', 'java',
              'css', 'spring', 'jquery', 'capstone', 'php', 'cli', 'git', 'laravel', 'angular', 'web-design', 'prework',
-             'apache', 'django', 'other_topics', 'pre-work']
+             'apache', 'django', 'pre-work']
 
     all_topics_reg_ex = '|'.join(topics)
     
-    df= df[~df.str.contains(all_topics_reg_ex, case=False)]
+    series = series[~series.str.contains(all_topics_reg_ex, case=False)]
     
-    return df
+    return series
 
 def without_file_pages(the_df):
+    ''' 
+    Returns a series of least viewed pages without file extensions at the end of a path.
+    '''
+    
     series = accessed_once_series(the_df)
     files = ['.html', '.json', '.aspx', '.jpg', '.jpeg', '.png', '.csv', '.mov', '.zip', 'slides', '.md', '.txt',
              '.ico']
@@ -308,6 +317,11 @@ def without_file_pages(the_df):
 
 
 def create_least_viewed_viz(df):
+    '''
+    Creates the data for least accessed pages, then graphs the pages
+    categorized by subtopic. Takes in the original data frame.
+    '''
+
     df.path = df.path.astype('string')
     df= df.fillna(' ')
     least= least_accessed(df)
@@ -315,4 +329,3 @@ def create_least_viewed_viz(df):
     plt.title('Subject Frequency in Least Viewed Pages')
     sns.barplot(data= least[:6], x = 'topic', y = 'num_times_accessed')
     
-######
