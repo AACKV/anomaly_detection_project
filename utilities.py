@@ -440,3 +440,19 @@ def plot_top_bot_five(intro_path):
     return axes
 
 
+def most_ds_lesson():
+    df = wrangle.wrangle_logs()
+    ds = df[df.program_id == 3]
+    ds = ds[ds.name != "Staff"]
+    ds = ds[(ds.path !=  '/')]
+    ds = ds[(ds.path != 'search/search_index.json')]
+    files = ['.html', '.json', '.aspx', '.svg', '.jpg', '.jpeg', '.png', '.csv', '.mov', '.zip', 'slides', '.md', '.txt', '.ico']
+    files = [file+ '$' if file != 'slides' else file for file in files]
+    files = '|'.join(files)
+    ds.path = ds.path.astype('string')
+    ds = ds[~ds.path.str.contains(files)]
+    results = pd.DataFrame(ds[['path']].value_counts().head())
+    results = results.reset_index()
+    results[['path', 'times_accessed']] = results
+    results = results.drop(columns=0)
+    sns.barplot(data = results, y = 'path', x = 'times_accessed')
