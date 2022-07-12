@@ -6,7 +6,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import plotly.express as px
-
+import wrangle
 
 def scrape_ip_locations(df, index_num=0):
     '''
@@ -342,3 +342,19 @@ def create_least_viewed_viz(df):
     plt.title('Subject Frequency in Least Viewed Pages')
     sns.barplot(data= least[:6], x = 'topic', y = 'num_times_accessed')
     
+def no_cohorts():
+    altdf = wrangle.wrangle_logs(fillna = False)
+    no_cohort = altdf[altdf.cohort_id.isna()]
+    no_cohort = no_cohort.dropna(axis=0, subset=['ip'])
+    plt.figure(figsize=(16, 5)) 
+    sns.histplot(data=no_cohort.date, bins = 100)
+    plt.title('Curriculum Access for Users with No Cohort')
+    plt.show()
+
+def sample_cohort():
+    altdf = wrangle.wrangle_logs(fillna = False)
+    plt.figure(figsize=(16, 5)) 
+    sns.histplot(data=altdf[altdf.cohort_id == 23].date, bins =100)
+    plt.title('Example of Normal Curriculum Access for Users from Ulysses Cohort')
+    plt.xlim(left = 17500)
+    plt.show()
