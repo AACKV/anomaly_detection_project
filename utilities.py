@@ -233,8 +233,9 @@ def anomalies_df(df):
 def pages_chart(df):
     '''this function creates an interactive chart that plots the number of pages visited per day'''
     pages = df['path'].resample('d').count()
-    return px.line(x = pages.index, y = pages)
-
+    pages_df = pd.DataFrame(pages)
+    pages_df = pages_df.rename(columns = {'path':'Number of Pages'})
+    return px.line(pages_df, x = pages_df.index, y = "Number of Pages", title = "Number of Pages Visited By Day")
 
 
 def accessed_once_series(df):
