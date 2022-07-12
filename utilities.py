@@ -437,8 +437,6 @@ def plot_top_bot_five(intro_path):
 
     plt.show()
 
-    return axes
-
 
 def most_ds_lesson():
     df = wrangle.wrangle_logs()
@@ -452,6 +450,25 @@ def most_ds_lesson():
     ds.path = ds.path.astype('string')
     ds = ds[~ds.path.str.contains(files)]
     results = pd.DataFrame(ds[['path']].value_counts().head())
+    results = results.reset_index()
+    results[['path', 'times_accessed']] = results
+    results = results.drop(columns=0)
+    sns.barplot(data = results, y = 'path', x = 'times_accessed')
+
+
+def most_webdev_lesson():
+    df = wrangle.wrangle_logs()
+    wd = df[df.program_id != 3]
+    wd = wd[wd.name != "Staff"]
+    wd = wd[(wd.path !=  '/')]
+    wd = wd[(wd.path != 'search/search_index.json')]
+    files = ['.html', '.json', '.aspx', '.svg', '.jpg', '.jpeg', '.png', '.csv', '.mov', '.zip', 'slides', '.md', '.txt', '.ico']
+    files = [file+ '$' if file != 'slides' else file for file in files]
+    files = '|'.join(files)
+    wd.path = wd.path.astype('string')
+    wd = wd[~wd.path.str.contains(files)]
+    wd = wd[wd.path.str.contains('/')]
+    results = pd.DataFrame(wd[['path']].value_counts().head())
     results = results.reset_index()
     results[['path', 'times_accessed']] = results
     results = results.drop(columns=0)
