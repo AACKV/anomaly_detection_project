@@ -147,13 +147,18 @@ def webdev_subtopics():
 
 
 def anomalies_df(df):
+'''this function takes in a dataframe and gets a count of anomalies by user.''' 
+
 
     def prep(df, user):
+        '''this function takes the user and gets the count of the number of paths that a user takes by day'''
+
         df = df[df.user_id == user]
         pages = df['path'].resample('d').count()
         return pages
 
     def compute_pct_b(pages, span, weight, user):
+        '''this function gets the bandwidth that was used in a day'''
         midband = pages.ewm(span=span).mean()
         stdev = pages.ewm(span=span).std()
         ub = midband + stdev*weight
@@ -166,6 +171,7 @@ def anomalies_df(df):
         return my_df
 
     def plt_bands(my_df, user):
+        '''this function plots the bandwidth used by day. the x represents time and the y represents the number of pages'''
         fig, ax = plt.subplots(figsize=(12,8))
         ax.plot(my_df.index, my_df.pages, label='Number of Pages, User: '+str(user))
         ax.plot(my_df.index, my_df.midband, label = 'EMA/midband')
@@ -176,11 +182,11 @@ def anomalies_df(df):
         plt.show()
 
     def find_anomalies(df, user, span, weight):
+        '''this function uses the compute_pct_b function and returns results where that where the result is greater than 1'''
         pages = prep(df, user)
         my_df = compute_pct_b(pages, span, weight, user)
-        # plt_bands(my_df, user)
         return my_df[my_df.pct_b>1]
-
+    '''the following section establishes an anomaly df with the top 6 anomalies. These top 6 each had 150+ pages.'''
     user = 1
     span = 30
     weight = 6
@@ -207,6 +213,7 @@ def anomalies_df(df):
     df = df.head(6)
 
     def anomaly_df_builder(df):
+        '''this function adds ip, cohort, city, country, and region(state) of the user to the anomaly df'''
         suspicious_ips = ['204.44.112.76', '108.65.244.91', '172.124.70.146', '70.130.123.81', '99.88.62.179', '136.50.20.17']
         cohort_list = ['Zion', 'Teddy' , 'Europa' , 'Hyperion', 'Europa', 'Wrangell' ]
         city_list = ['Dallas', 'San_Antonio' , 'San_Antonio' , 'San_Antonio' , 'San_Antonio', 'San_Antonio']
@@ -221,6 +228,11 @@ def anomalies_df(df):
 
     df = anomaly_df_builder(df)
     return df
+
+def pages_chart(df):
+    '''this function creates an interactive chart that plots the number of pages visited per day'''
+    pages = df['path'].resample('d').count()
+    return px.line(x = pages.index, y = pages)
 
 
 
