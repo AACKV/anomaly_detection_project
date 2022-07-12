@@ -58,29 +58,42 @@ def get_cohorts_data():
 
 
 
-def wrangle_logs():
+def wrangle_logs(fillna = True):
     '''Wrangles the curriculum access logs, converts date + time to one datetime column, drops unnecessary columns'''
+    if fillna == True:
+        # load in cohort/logs
+        cohorts = get_cohorts_data()
+        logs = get_logs_data()
+
+        # dropping unnamed col
+        for col in cohorts.columns:
+            if 'Unnamed' in col or 'deleted' in col:
+                cohorts = cohorts.drop(columns=[col])
+
+        for col in logs.columns:
+            if 'Unnamed' in col:
+                logs = logs.drop(columns=[col])
+
+        # Join and format final table
+        logs = logs.fillna(0)
+        df = pd.merge(left_on=logs.cohort_id, right_on=cohorts.id, left=logs, right=cohorts,how='outer')
+        df.date = pd.to_datetime(df.date + " " + df.time)
+        df = df.drop(columns=['key_0', 'id', 'time'])
+
+        return df
     
-    # load in cohort/logs
-    cohorts = get_cohorts_data()
-    logs = get_logs_data()
+    else:
+        # load in cohort/logs
+        cohorts = get_cohorts_data()
+        logs = get_logs_data()
 
-    # dropping unnamed col
-    for col in cohorts.columns:
-        if 'Unnamed' in col or 'deleted' in col:
-            cohorts = cohorts.drop(columns=[col])
+        # Join and format table without filling nulls
+        cohorts = cohorts.drop(columns = ['slack', 'created_at', 'updated_at', 'deleted_at'])
+        df = pd.merge(logs, cohorts, how = 'outer', left_on = 'cohort_id', right_on= 'id')
+        df.date = pd.to_datetime(df.date + " " + df.time)
+        df = df.drop(columns=['id', 'time'])
 
-    for col in logs.columns:
-        if 'Unnamed' in col:
-            logs = logs.drop(columns=[col])
-
-    # Join and format final table
-    logs = logs.fillna(0)
-    df = pd.merge(left_on=logs.cohort_id, right_on=cohorts.id, left=logs, right=cohorts,how='outer')
-    df.date = pd.to_datetime(df.date + " " + df.time)
-    df = df.drop(columns=['key_0', 'id', 'time'])
-
-    return df
+        return df
 
 def make_datetime_index(df):
     df = df.set_index('date').sort_index()
