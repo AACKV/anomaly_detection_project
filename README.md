@@ -1,5 +1,7 @@
 # CodeUp Curriculum Logs Anomaly Detection 
 
+<img src="images/codeup_chevron.png" width = 645>
+
 ## Project Overview: 
 - Working with a team, explore the CodeUp curriculum logs in order to provide responses to at least five of the following questions: 
   1. Which lesson appears to attract the most traffic consistently across cohorts (per program)?
@@ -10,6 +12,18 @@
   6. What topics are grads continuing to reference after graduation and into their jobs (for each program)?
   7. Which lessons are least accessed?
   8. Anything else I should be aware of?
+
+## Executive Summary:
+- It seems as if two cohorts were not properly assigned names. This largely accounts for the missing data. 
+  - Missing cohort identifiers likely account for most unexplained anomalies.
+- The most accessed lessons are as follows:
+  - For WebDev: Working with data types, operators, and variables
+  - For Data Science: Classification Overview
+- The Marco cohort has the most searches of the most accessed javascript lesson.
+  - In terms of traffic, top five cohorts make up 26% of traffic to that lesson, while the bottom five makes up 0.2% of traffic.
+- For the Web Development program Java lessons account for 21.5%, Javascript lessons account for 20.6%, and Spring lessons account for 13.3% of all content accessed by WebDev grads after graduation. Of note, the top four most accessed lessons were all covering Spring.
+- For the Data Science program SQL lessons account for 16.2%, Fundamentals lessons account for 15.8%, and Classification lessons account for 13.7% of all content accessed by DS grads after graduation.
+- 450 of the 2300 (~20%) pages have been accessed only once.
 
 ## Business Goals:
 - Provide responses to at least 5 of the questions above to the supervisor in a timely fashion. 
