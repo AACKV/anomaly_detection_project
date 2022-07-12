@@ -90,6 +90,7 @@ def ds_visuals(ds_after_grad):
     data showing the most commonly accessed topics and prints out a statement giving percentage values of each of the three largest 
     topics.
     '''
+    
     ds_results = {'topic': ['capstone','sql','python', 'stats', 'fundamentals', 'regression', 'clustering', 'nlp', 'appendix', 'timeseries', 'anomaly', 'classification', 'spark', 'python', 'storytelling','other_topics'], 
               'num_times_accessed': [ds_after_grad[ds_after_grad.path.str.contains('capstone')].shape[0],
                                 ds_after_grad[ds_after_grad.path.str.contains('sql')].shape[0],
@@ -153,17 +154,24 @@ def webdev_subtopics():
 
 
 def anomalies_df(df):
-    '''this function takes in a dataframe and gets a count of anomalies by user.''' 
+    '''
+    This function takes in a dataframe and gets a count of anomalies by user.
+    ''' 
 
     def prep(df, user):
-        '''this function takes the user and gets the count of the number of paths that a user takes by day'''
+        '''
+        This function takes the user and gets the count of the number of paths that a user takes by day.
+        '''
 
         df = df[df.user_id == user]
         pages = df['path'].resample('d').count()
         return pages
 
     def compute_pct_b(pages, span, weight, user):
-        '''this function gets the bandwidth that was used in a day'''
+        '''
+        This function gets the bandwidth that was used in a day.
+        '''
+
         midband = pages.ewm(span=span).mean()
         stdev = pages.ewm(span=span).std()
         ub = midband + stdev*weight
@@ -176,7 +184,9 @@ def anomalies_df(df):
         return my_df
 
     def plt_bands(my_df, user):
-        '''this function plots the bandwidth used by day. the x represents time and the y represents the number of pages'''
+        '''
+        This function plots the bandwidth used by day. the x represents time and the y represents the number of pages
+        '''
         fig, ax = plt.subplots(figsize=(12,8))
         ax.plot(my_df.index, my_df.pages, label='Number of Pages, User: '+str(user))
         ax.plot(my_df.index, my_df.midband, label = 'EMA/midband')
@@ -187,7 +197,9 @@ def anomalies_df(df):
         plt.show()
 
     def find_anomalies(df, user, span, weight):
-        '''this function uses the compute_pct_b function and returns results where that where the result is greater than 1'''
+        '''
+        This function uses the compute_pct_b function and returns results where that where the result is greater than 1
+        '''
         pages = prep(df, user)
         my_df = compute_pct_b(pages, span, weight, user)
         return my_df[my_df.pct_b>1]
@@ -218,7 +230,9 @@ def anomalies_df(df):
     df = df.head(6)
 
     def anomaly_df_builder(df):
-        '''this function adds ip, cohort, city, country, and region(state) of the user to the anomaly df'''
+        '''
+        This function adds ip, cohort, city, country, and region(state) of the user to the anomaly df
+        '''
         suspicious_ips = ['204.44.112.76', '108.65.244.91', '172.124.70.146', '70.130.123.81', '99.88.62.179', '136.50.20.17']
         cohort_list = ['Zion', 'Teddy' , 'Europa' , 'Hyperion', 'Europa', 'Wrangell' ]
         city_list = ['Dallas', 'San_Antonio' , 'San_Antonio' , 'San_Antonio' , 'San_Antonio', 'San_Antonio']
@@ -234,19 +248,23 @@ def anomalies_df(df):
     df = anomaly_df_builder(df)
     return df
 
+
 def pages_chart(df):
-    '''this function creates an interactive chart that plots the number of pages visited per day'''
+    '''
+    This function creates an interactive chart that plots the number of pages visited per day.
+    '''
+
     pages = df['path'].resample('d').count()
     pages_df = pd.DataFrame(pages)
     pages_df = pages_df.rename(columns = {'path':'Number of Pages'})
     return px.line(pages_df, x = pages_df.index, y = "Number of Pages", title = "Number of Pages Visited By Day")
 
 
-
 def accessed_once_series(df):
     '''
     Input is the original dataframe, returns a series of paths that were only accessed once.
     '''
+
     occurs_once = []
 
     for index in df.path.unique()[:-1]:
@@ -256,6 +274,7 @@ def accessed_once_series(df):
     series = pd.Series(occurs_once, name='paths').dropna()
     
     return series
+
 
 def least_accessed_by_category(series):
     '''
@@ -308,6 +327,7 @@ def least_accessed_by_category(series):
     results = pd.DataFrame(results).sort_values('num_times_accessed', ascending=False)
     return results
 
+
 def other_topics(df):
     ''' 
     Returns a series of the pages accessed once that don't fall into a specified category,
@@ -326,6 +346,7 @@ def other_topics(df):
     series = series[~series.str.contains(all_topics_reg_ex, case=False)]
     
     return series
+
 
 def without_file_pages(the_df):
     ''' 
@@ -352,6 +373,7 @@ def create_least_viewed_viz(results):
     plt.title('Subject Frequency in Least Viewed Pages')
     sns.barplot(data= results[:6], x = 'topic', y = 'num_times_accessed')
     
+
 def no_cohorts():
     '''
     This function creates a dataframe of access logs for which there is no cohort data and then it visulizes the access logs over time.
@@ -363,6 +385,7 @@ def no_cohorts():
     sns.histplot(data=no_cohort.date, bins = 100)
     plt.title('Curriculum Access for Users with No Cohort')
     plt.show()
+
 
 def sample_cohort():
     '''
@@ -387,16 +410,18 @@ def value_counts_and_frequencies(s: pd.Series, dropna=True) -> pd.DataFrame:
         s.value_counts(dropna=False, normalize=True).rename('percent'),
         left_index=True, right_index=True)
 
+
 def display_cohort_traffic(freq_df):
     '''
-    
+    This function displays the top and bottom five cohorts by traffic.
+
     '''
     display_side_by_side(freq_df[:5], freq_df[-5:], titles = ['Top 5 Cohorts by Traffic', 'Bottom 5 Cohorts by Traffic'])
 
 
 def display_side_by_side(*args,titles=cycle([''])):
     '''
-    
+    This allows the display of two or more DataFrame tables side by side.
     '''
     html_str=''
     for df,title in zip(args, chain(titles,cycle(['</br>'])) ):
@@ -406,24 +431,47 @@ def display_side_by_side(*args,titles=cycle([''])):
         html_str+='</td></th>'
     display_html(html_str,raw=True)
 
+
 def path_counts(df_path):
+    '''
+    Gets the value/frequency counts of each path,
+    creates a dataframe, then returns the list of paths 
+    that contain a '/' (not a parent page)
+    '''
     path_df = value_counts_and_frequencies(df_path)
     path_df = path_df[~path_df.index.isna()].reset_index().rename(columns={'index':'path'})
     path_df.path = path_df.path.astype('string')
     return path_df[path_df.path.str.contains('/')]
 
+
 def intro_path_df(df):
+    '''
+    Returns non-data science program roles that have accessed the most popular
+    lesson.
+    '''
+
     return df[(df.path== 'javascript-i/introduction/\
 working-with-data-types-operators-and-variables') & (df.program_id != 3) & (df.program_id != 0)],\
     df[(df.program_id != 3)&(df.program_id != 0)].name.unique().size
 
+
 def top_bot_5(intro_freq):
+    '''
+    Displays the percentage of traffic that the top and bottom 5 cohorts account for 
+    compared to the total traffic of a given frequency page table.
+    '''
+    
     top_5 = round(intro_freq['count'][:5].sum() / intro_freq['count'].sum() * 100, 1)
     bot_5 = round(intro_freq['count'][-5:].sum()/ intro_freq['count'].sum() * 100, 1)
     print(f'The top 5 cohorts account for {top_5}% of traffic to the most popular lesson, while the bottom 5 cohorts  \
     account for {bot_5}% of traffic.')  
 
+
 def plot_top_bot_five(intro_path):
+    '''
+    Plots the traffic data of the top and bottom 5 cohorts side by side.
+    '''
+    
     fig, axes = plt.subplots(1, 2, figsize=(15, 6.5), sharey=True)
     fig.suptitle('Traffic Visualized')
 
@@ -439,6 +487,10 @@ def plot_top_bot_five(intro_path):
 
 
 def most_ds_lesson():
+    '''
+    Plots the ds lesson accessed the most for data science.
+    '''
+    
     df = wrangle.wrangle_logs()
     ds = df[df.program_id == 3]
     ds = ds[ds.name != "Staff"]
@@ -457,6 +509,10 @@ def most_ds_lesson():
 
 
 def most_webdev_lesson():
+    '''
+    Plots the webdev lesson that was accessed the most by webdev students.
+    '''
+
     df = wrangle.wrangle_logs()
     wd = df[df.program_id != 3]
     wd = wd[wd.name != "Staff"]
