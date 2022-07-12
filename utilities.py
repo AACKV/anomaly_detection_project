@@ -227,6 +227,7 @@ def anomalies_df(df):
                                       region = region_list)
         return df
 
+
     df = anomaly_df_builder(df)
     return df
 
