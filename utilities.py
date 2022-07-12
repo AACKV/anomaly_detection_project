@@ -5,6 +5,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import plotly.express as px
 
 def scrape_ip_locations(df, index_num=0):
     '''
@@ -207,7 +208,7 @@ def anomalies_df(df):
     df = df.sort_values(by = ['pages'], ascending = False)
 
     columns = ['midband', 'ub', 'lb', 'pct_b']
-    df = sorted_df.drop(columns, axis = 1)
+    df = df.drop(columns, axis = 1)
 
     df = df.head(6)
 
