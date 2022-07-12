@@ -220,7 +220,7 @@ def anomalies_df(df):
         city_list = ['Dallas', 'San_Antonio' , 'San_Antonio' , 'San_Antonio' , 'San_Antonio', 'San_Antonio']
         country_list = ['US','US','US','US','US', 'US']
         region_list = ['Texas','Texas','Texas','Texas', 'Texas', 'Texas']
-        df.assign(cohort = cohort_list,
+        df = df.assign(cohort = cohort_list,
                                        ip = suspicious_ips,
                                        city = city_list, 
                                       country = country_list,
