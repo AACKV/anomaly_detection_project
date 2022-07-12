@@ -7,6 +7,10 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import plotly.express as px
 import wrangle
+from IPython.display import display_html
+from itertools import chain,cycle
+
+
 
 def scrape_ip_locations(df, index_num=0):
     '''
@@ -243,17 +247,25 @@ def accessed_once_series(df):
     '''
     Input is the original dataframe, returns a series of paths that were only accessed once.
     '''
+    occurs_once = []
 
-    series = pd.Series((df.path.value_counts()==1).index, name='paths').dropna()
+    for index in df.path.unique()[:-1]:
+        if df.path.value_counts().loc[index] == 1:
+            occurs_once.append(index)
+
+    series = pd.Series(occurs_once, name='paths').dropna()
+    
     return series
 
-def least_accessed(the_df):
+def least_accessed_by_category(series):
     '''
     Returns a df that contains the times a certain topic has been accessed by its appearance in a path.
     Topics defined by 'topics' list.
     '''
 
-    df = accessed_once_series(the_df)
+    df = series
+    df = df.astype('string')
+    df = df.fillna(' ')
 
     topics = ['sql', 'python', 'stats', 'fundamentals', 'regression', 'clustering', 'nlp',
               'appendix', 'timeseries', 'anomaly', 'classification', 'spark', 'storytelling', 'javascript', 'java',
@@ -331,18 +343,14 @@ def without_file_pages(the_df):
     return series
 
 
-def create_least_viewed_viz(df):
+def create_least_viewed_viz(results):
     '''
     Creates the data for least accessed pages, then graphs the pages
     categorized by subtopic. Takes in the original data frame.
     '''
 
-    df.path = df.path.astype('string')
-    df= df.fillna(' ')
-    least= least_accessed(df)
-
     plt.title('Subject Frequency in Least Viewed Pages')
-    sns.barplot(data= least[:6], x = 'topic', y = 'num_times_accessed')
+    sns.barplot(data= results[:6], x = 'topic', y = 'num_times_accessed')
     
 def no_cohorts():
     '''
@@ -367,20 +375,68 @@ def sample_cohort():
     plt.xlim(left = 17500)
     plt.show()
 
-def most_ds_lesson():
-    df = wrangle.wrangle_logs()
-    ds = df[df.program_id == 3]
-    ds = ds[ds.name != "Staff"]
-    ds = ds[(ds.path !=  '/')]
-    ds = ds[(ds.path != 'search/search_index.json')]
-    files = ['.html', '.json', '.aspx', '.svg', '.jpg', '.jpeg', '.png', '.csv', '.mov', '.zip', 'slides', '.md', '.txt', '.ico']
-    files = [file+ '$' if file != 'slides' else file for file in files]
-    files = '|'.join(files)
-    ds.path = ds.path.astype('string')
-    ds = ds[~ds.path.str.contains(files)]
-    results = pd.DataFrame(ds[['path']].value_counts().head())
-    results = results.reset_index()
-    results[['path', 'times_accessed']] = results
-    results = results.drop(columns=0)
-    sns.barplot(data = results, y = 'path', x = 'times_accessed')
+
+def value_counts_and_frequencies(s: pd.Series, dropna=True) -> pd.DataFrame:
+    '''
+    This function takes in a Pandas Series
+    and returns a dataframe of the count of the
+    Series and the corresponding percent
+    '''
+    return pd.merge(
+        s.value_counts(dropna=False).rename('count'),
+        s.value_counts(dropna=False, normalize=True).rename('percent'),
+        left_index=True, right_index=True)
+
+def display_cohort_traffic(freq_df):
+    '''
+    
+    '''
+    display_side_by_side(freq_df[:5], freq_df[-5:], titles = ['Top 5 Cohorts by Traffic', 'Bottom 5 Cohorts by Traffic'])
+
+
+def display_side_by_side(*args,titles=cycle([''])):
+    '''
+    
+    '''
+    html_str=''
+    for df,title in zip(args, chain(titles,cycle(['</br>'])) ):
+        html_str+='<th style="text-align:center"><td style="vertical-align:top">'
+        html_str+=f'<h2>{title}</h2>'
+        html_str+=df.to_html().replace('table','table style="display:inline"')
+        html_str+='</td></th>'
+    display_html(html_str,raw=True)
+
+def path_counts(df_path):
+    path_df = value_counts_and_frequencies(df_path)
+    path_df = path_df[~path_df.index.isna()].reset_index().rename(columns={'index':'path'})
+    path_df.path = path_df.path.astype('string')
+    return path_df[path_df.path.str.contains('/')]
+
+def intro_path_df(df):
+    return df[(df.path== 'javascript-i/introduction/\
+working-with-data-types-operators-and-variables') & (df.program_id != 3) & (df.program_id != 0)],\
+    df[(df.program_id != 3)&(df.program_id != 0)].name.unique().size
+
+def top_bot_5(intro_freq):
+    top_5 = round(intro_freq['count'][:5].sum() / intro_freq['count'].sum() * 100, 1)
+    bot_5 = round(intro_freq['count'][-5:].sum()/ intro_freq['count'].sum() * 100, 1)
+    print(f'The top 5 cohorts account for {top_5}% of traffic to the most popular lesson, while the bottom 5 cohorts  \
+    account for {bot_5}% of traffic.')  
+
+def plot_top_bot_five(intro_path):
+    fig, axes = plt.subplots(1, 2, figsize=(15, 6.5), sharey=True)
+    fig.suptitle('Traffic Visualized')
+
+    top_5 = intro_path.name.value_counts(dropna=False, ascending=False).head()
+    bot_5 = intro_path.name.value_counts(dropna=False, ascending=True).head()
+
+    axes[0].set_title('Top 5 Cohorts by Traffic')
+    axes[1].set_title('Bottom 5 Cohorts by Traffic')    
+    sns.barplot(ax = axes[0], x=top_5.index, y=top_5.values)
+    sns.barplot(ax = axes[1], x=bot_5.index, y=bot_5.values)
+
     plt.show()
+
+    return axes
+
+
