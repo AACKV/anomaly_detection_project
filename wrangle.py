@@ -83,7 +83,5 @@ def wrangle_logs():
     return df
 
 def make_datetime_index(df):
-    df['datetime'] = pd.to_datetime(df.date + ' ' + df.time)
-    df = df.set_index('datetime').sort_index()
-    df = df.drop(columns= ['Unnamed: 0', 'date', 'time', 'id'])
+    df = df.set_index('date').sort_index()
     return df
