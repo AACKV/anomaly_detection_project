@@ -74,7 +74,7 @@ def webdev_visuals(wd_after_grad):
     plt.title('Web Development Curriculum Access Post Graduation')
     plt.show()
 
-    print("The two largest subgroups are as follows:\n"
+    print("The two largest topics are as follows:\n"
      f"Java accounts for {round(wd_after_grad[wd_after_grad.path.str.contains('java[-/]|_java|java$')].shape[0] / wd_after_grad.shape[0], 4)*100}% \n"
      f"Javascript accounts for {round(wd_after_grad[wd_after_grad.path.str.contains('javascript[-/]|javascript$')].shape[0]/ wd_after_grad.shape[0], 4)*100}%")
 
@@ -108,7 +108,7 @@ def ds_visuals(ds_after_grad):
     plt.title('Data Science Curriculum Access Post Graduation')
     plt.show()
 
-    print("The largest subgroups are as follows:\n"
+    print("The largest topics are as follows:\n"
      f"SQL accounts for {round(ds_after_grad[ds_after_grad.path.str.contains('sql', case = False)].shape[0] / ds_after_grad.shape[0], 4)*100}% \n"
      f"Fundamentals accounts for {round(ds_after_grad[ds_after_grad.path.str.contains('fundamentals', case = False)].shape[0]/ ds_after_grad.shape[0], 4)*100}%\n"
      f"Classification accounts for {round(round(ds_after_grad[ds_after_grad.path.str.contains('classification', case = False)].shape[0]/ ds_after_grad.shape[0], 4)*100, 4)}%")
@@ -147,8 +147,7 @@ def webdev_subtopics():
 
 
 def anomalies_df(df):
-'''this function takes in a dataframe and gets a count of anomalies by user.''' 
-
+    '''this function takes in a dataframe and gets a count of anomalies by user.''' 
 
     def prep(df, user):
         '''this function takes the user and gets the count of the number of paths that a user takes by day'''
@@ -199,22 +198,17 @@ def anomalies_df(df):
     span = 30
     weight = 3.5
 
-    # creates empty anomaly df. concats anomalies and user df. 
     anomalies = pd.DataFrame()
     for u in list(df.user_id.unique()):
         user_df = find_anomalies(df, u, span, weight)
         anomalies = pd.concat([anomalies, user_df], axis=0)
 
-
-    # creates a df where the amount of pages is greater than or equal to 100. Sorts by pages in descending order
     df = anomalies[anomalies.pages  >= 100]
     df = df.sort_values(by = ['pages'], ascending = False)
-    
-    #drops the columns that aren't needed
+
     columns = ['midband', 'ub', 'lb', 'pct_b']
     df = sorted_df.drop(columns, axis = 1)
 
-    # establishes df based off of top 6 
     df = df.head(6)
 
     def anomaly_df_builder(df):
