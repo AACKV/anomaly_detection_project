@@ -238,6 +238,7 @@ def pages_chart(df):
     return px.line(pages_df, x = pages_df.index, y = "Number of Pages", title = "Number of Pages Visited By Day")
 
 
+
 def accessed_once_series(df):
     '''
     Input is the original dataframe, returns a series of paths that were only accessed once.
