@@ -147,8 +147,7 @@ def webdev_subtopics():
 
 
 def anomalies_df(df):
-'''this function takes in a dataframe and gets a count of anomalies by user.''' 
-
+    '''this function takes in a dataframe and gets a count of anomalies by user.''' 
 
     def prep(df, user):
         '''this function takes the user and gets the count of the number of paths that a user takes by day'''
@@ -199,22 +198,17 @@ def anomalies_df(df):
     span = 30
     weight = 3.5
 
-    # creates empty anomaly df. concats anomalies and user df. 
     anomalies = pd.DataFrame()
     for u in list(df.user_id.unique()):
         user_df = find_anomalies(df, u, span, weight)
         anomalies = pd.concat([anomalies, user_df], axis=0)
 
-
-    # creates a df where the amount of pages is greater than or equal to 100. Sorts by pages in descending order
     df = anomalies[anomalies.pages  >= 100]
     df = df.sort_values(by = ['pages'], ascending = False)
-    
-    #drops the columns that aren't needed
+
     columns = ['midband', 'ub', 'lb', 'pct_b']
     df = sorted_df.drop(columns, axis = 1)
 
-    # establishes df based off of top 6 
     df = df.head(6)
 
     def anomaly_df_builder(df):
