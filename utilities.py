@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import plotly.express as px
 
+
 def scrape_ip_locations(df, index_num=0):
     '''
     Needs original access log df (900000 rows), index_num = n where n is which ip address index you want to start at
