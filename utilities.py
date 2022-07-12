@@ -344,6 +344,9 @@ def create_least_viewed_viz(df):
     sns.barplot(data= least[:6], x = 'topic', y = 'num_times_accessed')
     
 def no_cohorts():
+    '''
+    This function creates a dataframe of access logs for which there is no cohort data and then it visulizes the access logs over time.
+    '''
     altdf = wrangle.wrangle_logs(fillna = False)
     no_cohort = altdf[altdf.cohort_id.isna()]
     no_cohort = no_cohort.dropna(axis=0, subset=['ip'])
@@ -353,6 +356,9 @@ def no_cohorts():
     plt.show()
 
 def sample_cohort():
+    '''
+    This function visulizes the access logs over time for an example cohort.
+    '''
     altdf = wrangle.wrangle_logs(fillna = False)
     plt.figure(figsize=(16, 5)) 
     sns.histplot(data=altdf[altdf.cohort_id == 23].date, bins =100)
